@@ -17,3 +17,15 @@ export const getCandidatesByPosition = async (positionId) => {
         throw new Error('Error fetching candidates:', error.response.data);
     }
 }; 
+
+export const updateCandidateStage = async (candidateId, applicationId, newStepId) => {
+    try {
+        const response = await axios.put(`http://localhost:3010/candidates/${candidateId}`, {
+            applicationId,
+            currentInterviewStep: newStepId
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error('Error updating candidate stage:', error.response.data);
+    }
+}; 

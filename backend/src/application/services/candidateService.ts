@@ -65,15 +65,15 @@ export const findCandidateById = async (id: number): Promise<Candidate | null> =
     }
 };
 
-export const updateCandidateStage = async (id: number, applicationIdNumber: number, currentInterviewStep: number) => {
+export const updateCandidateStage = async (applicationId: number, candidateId: number, newInterviewStepId: number) => {
     try {
-        const application = await Application.findOneByPositionCandidateId(applicationIdNumber, id);
+        const application = await Application.findOneByPositionCandidateId(applicationId, candidateId);
         if (!application) {
             throw new Error('Application not found');
         }
 
         // Actualizar solo la etapa de la entrevista actual de la aplicación específica
-        application.currentInterviewStep = currentInterviewStep;
+        application.currentInterviewStep = newInterviewStepId;
 
         // Guardar la aplicación actualizada
         await application.save();

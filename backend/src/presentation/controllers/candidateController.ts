@@ -33,27 +33,47 @@ export const getCandidateById = async (req: Request, res: Response) => {
 
 export const updateCandidateStageController = async (req: Request, res: Response) => {
     try {
-        const id = parseInt(req.params.id);
-        const { applicationId, currentInterviewStep } = req.body;
+        const candidateId = parseInt(req.params.id);
+        const { applicationId, currentInterviewStep: newInterviewStepId } = req.body;
+        
         const applicationIdNumber = parseInt(applicationId);
         if (isNaN(applicationIdNumber)) {
-            return res.status(400).json({ error: 'Invalid position ID format' });
+            return res.status(400).json({ error: 'Invalid application ID format' });
         }
-        const currentInterviewStepNumber = parseInt(currentInterviewStep);
-        if (isNaN(currentInterviewStepNumber)) {
-            return res.status(400).json({ error: 'Invalid currentInterviewStep format' });
+
+        const newInterviewStepIdNumber = parseInt(newInterviewStepId);
+        if (isNaN(newInterviewStepIdNumber)) {
+            return res.status(400).json({ error: 'Invalid interview step format' });
         }
-        const updatedCandidate = await updateCandidateStage(id, applicationIdNumber, currentInterviewStepNumber);
-        res.status(200).json({ message: 'Candidate stage updated successfully', data: updatedCandidate });
+
+        const updatedApplication = await updateCandidateStage(
+            applicationIdNumber,
+            candidateId,
+            newInterviewStepIdNumber
+        );
+
+        res.status(200).json({ 
+            message: 'Candidate stage updated successfully', 
+            data: updatedApplication 
+        });
     } catch (error: unknown) {
         if (error instanceof Error) {
             if (error.message === 'Error: Application not found') {
-                res.status(404).json({ message: 'Application not found', error: error.message });
+                res.status(404).json({ 
+                    message: 'Application not found', 
+                    error: error.message 
+                });
             } else {
-                res.status(400).json({ message: 'Error updating candidate stage', error: error.message });
+                res.status(400).json({ 
+                    message: 'Error updating candidate stage', 
+                    error: error.message 
+                });
             }
         } else {
-            res.status(500).json({ message: 'Error updating candidate stage', error: 'Unknown error' });
+            res.status(500).json({ 
+                message: 'Error updating candidate stage', 
+                error: 'Unknown error' 
+            });
         }
     }
 };

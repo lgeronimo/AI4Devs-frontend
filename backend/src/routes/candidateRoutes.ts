@@ -3,6 +3,10 @@ import { addCandidate, getCandidateById, updateCandidateStageController } from '
 
 const router = Router();
 
+router.get('/:id', getCandidateById);
+
+router.put('/:id', updateCandidateStageController);
+
 router.post('/', async (req, res) => {
   try {
     // console.log(req.body); //Just in case you want to inspect the request body
@@ -17,8 +21,5 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:id', getCandidateById);
-
-router.put('/:id', updateCandidateStageController);
 
 export default router;

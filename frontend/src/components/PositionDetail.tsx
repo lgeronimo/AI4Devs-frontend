@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { getPositionDetail, getCandidatesByPosition } from '../services/positionDetailService';
+import { getPositionDetail, getCandidatesByPosition, updateCandidateStage } from '../services/positionDetailService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
@@ -11,6 +11,7 @@ interface Candidate {
   fullName: string;
   currentInterviewStep: string;
   averageScore: number;
+  applicationId: number;
 }
 
 interface InterviewStep {
@@ -71,7 +72,7 @@ const PositionDetail = () => {
     return stars;
   };
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     const { source, destination, draggableId } = result;
 
     if (!destination || 
@@ -97,10 +98,24 @@ const PositionDetail = () => {
 
     newCandidates.splice(destination.index, 0, updatedCandidate);
 
-    setCandidates(newCandidates);
+    try {
+      setCandidates(newCandidates);
 
-    // TODO: Actualizar en el backend
-    // updateCandidateStage(updatedCandidate.id, applicationId, destination.droppableId);
+      const stepId = position?.interviewFlow.interviewSteps.find(
+        step => step.name === destination.droppableId
+      )?.id;
+
+      if (!stepId) throw new Error('Interview step not found');
+
+      await updateCandidateStage(
+        movedCandidate.id,
+        movedCandidate.applicationId,
+        stepId
+      );
+    } catch (error) {
+      console.error('Error updating candidate stage:', error);
+      setCandidates(candidates);
+    }
   };
 
   if (loading) {
