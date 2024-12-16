@@ -4,9 +4,10 @@ import { ArrowLeft } from 'lucide-react';
 import { getPositionDetail, getCandidatesByPosition } from '../services/positionDetailService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { log } from 'console';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
 interface Candidate {
+  id: number;
   fullName: string;
   currentInterviewStep: string;
   averageScore: number;
@@ -70,6 +71,38 @@ const PositionDetail = () => {
     return stars;
   };
 
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination, draggableId } = result;
+
+    if (!destination || 
+        (source.droppableId === destination.droppableId && 
+         source.index === destination.index)) {
+      return;
+    }
+
+    const movedCandidate = candidates.find(
+      candidate => candidate.id.toString() === draggableId
+    );
+
+    if (!movedCandidate) return;
+
+    const newCandidates = candidates.filter(
+      candidate => candidate.id.toString() !== draggableId
+    );
+
+    const updatedCandidate = {
+      ...movedCandidate,
+      currentInterviewStep: destination.droppableId
+    };
+
+    newCandidates.splice(destination.index, 0, updatedCandidate);
+
+    setCandidates(newCandidates);
+
+    // TODO: Actualizar en el backend
+    // updateCandidateStage(updatedCandidate.id, applicationId, destination.droppableId);
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
@@ -88,31 +121,45 @@ const PositionDetail = () => {
       </div>
 
       {/* Kanban Board */}
-      <div className="kanban-board">
-        {position?.interviewFlow.interviewSteps.map((step) => (
-          <div 
-            key={step.id}
-            className="kanban-column"
-          >
-            <h2 className="text-lg font-semibold">{step.name}</h2>
-            <div className="space-y-3">
-              {candidates
-                .filter(candidate => candidate.currentInterviewStep === step.name)
-                .map((candidate, index) => (
-                  <div 
-                    key={index}
-                    className="kanban-card"
-                  >
-                    <p className="font-medium">{candidate.fullName}</p>
-                    <div className="text-sm text-gray-600 score-badge">
-                      {renderStars(candidate.averageScore)}
-                    </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="kanban-board">
+          {position?.interviewFlow.interviewSteps.map((step) => (
+            <Droppable droppableId={step.name} key={step.id}>
+              {(provided) => (
+                <div 
+                  className="kanban-column"
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  <h2 className="text-lg font-semibold">{step.name}</h2>
+                  <div className="space-y-3">
+                    {candidates
+                      .filter(candidate => candidate.currentInterviewStep === step.name)
+                      .map((candidate, index) => (
+                        <Draggable key={candidate.id.toString()} draggableId={candidate.id.toString()} index={index}>
+                          {(provided) => (
+                            <div 
+                              className="kanban-card"
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <p className="font-medium">{candidate.fullName}</p>
+                              <div className="text-sm text-gray-600 score-badge">
+                                {renderStars(candidate.averageScore)}
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                    {provided.placeholder}
                   </div>
-                ))}
-            </div>
-          </div>
-        ))}
-      </div>
+                </div>
+              )}
+            </Droppable>
+          ))}
+        </div>
+      </DragDropContext>
     </div>
   );
 };
