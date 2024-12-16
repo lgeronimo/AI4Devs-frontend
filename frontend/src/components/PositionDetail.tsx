@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { getPositionDetail, getCandidatesByPosition } from '../services/positionDetailService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { log } from 'console';
 
 interface Candidate {
   fullName: string;
@@ -51,6 +54,22 @@ const PositionDetail = () => {
     fetchPositionData();
   }, [positionId]);
 
+  const renderStars = (score: number) => {
+    const stars = [];
+    const roundedScore = Math.round(score);
+    
+    for (let i = 0; i < 5; i++) {
+      stars.push(
+        <FontAwesomeIcon
+          key={i}
+          icon={faStar}
+          style={{ color: i < roundedScore ? '#fbbf24' : '#d1d5db' }}
+        />
+      );
+    }
+    return stars;
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
@@ -85,9 +104,9 @@ const PositionDetail = () => {
                     className="kanban-card"
                   >
                     <p className="font-medium">{candidate.fullName}</p>
-                    <p className="text-sm text-gray-600 score-badge">
-                      Score: {candidate.averageScore.toFixed(1)}
-                    </p>
+                    <div className="text-sm text-gray-600 score-badge">
+                      {renderStars(candidate.averageScore)}
+                    </div>
                   </div>
                 ))}
             </div>
