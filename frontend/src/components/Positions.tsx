@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { getPositions } from '../services/positionService';
+import { useNavigate } from 'react-router-dom';
 
 type Position = {
     id: number;
@@ -18,6 +19,7 @@ function formatDate(dateString: string): string {
 const Positions: React.FC = () => {
     const [positions, setPositions] = useState<Position[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPositions = async () => {
@@ -50,7 +52,12 @@ const Positions: React.FC = () => {
                                     {position.status}
                                 </span>
                                 <div className="d-flex justify-content-between mt-3">
-                                    <Button variant="primary">View Process</Button>
+                                    <Button 
+                                        variant="primary" 
+                                        onClick={() => navigate(`/positions/${position.id}`)}
+                                    >
+                                        View Process
+                                    </Button>
                                     <Button variant="secondary">Edit</Button>
                                 </div>
                             </Card.Body>

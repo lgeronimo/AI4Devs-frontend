@@ -11,3 +11,53 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@layer utilities {
+  .grid-cols-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+.kanban-board {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 16px;
+}
+
+.kanban-column {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
+    padding: 16px;
+    flex: 1;
+}
+
+.kanban-column h2 {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+    color: #3b82f6; /* Azul */
+}
+
+.kanban-card {
+    background-color: #e0f2fe; /* Azul claro */
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    margin-bottom: 8px;
+    padding: 12px;
+}
+
+.kanban-card p {
+    color: #1e3a8a; /* Azul oscuro */
+}
+
+.score-badge {
+    background-color: #fef3c7; /* Amarillo claro */
+    color: #b45309; /* Amarillo oscuro */
+    border-radius: 12px;
+    padding: 4px 8px;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 4px;
+}
