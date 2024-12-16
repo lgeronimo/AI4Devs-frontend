@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 router.get('/:id/candidates', getCandidatesByPosition);
-router.get('/:id/interviewflow', getInterviewFlowByPosition);
+router.get('/:id/interview-flow', getInterviewFlowByPosition);
 
 router.get('/', async (req, res) => {
     try {
